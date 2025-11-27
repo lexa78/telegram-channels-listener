@@ -1,0 +1,7 @@
+!.gitignore
+vendor
+session.madeline
+MadelineProto.log
+.env
+logs
+.idea
