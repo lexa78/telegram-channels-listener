@@ -49,10 +49,13 @@ class MessageReader extends EventHandler
             'channelId' => $channelId,
             'data' => $update,
         ];
-        $isPublished = self::$rabbit->publish(json_encode($message));
+        $encodedMessage = json_encode($message);
+        $isPublished = self::$rabbit->publish($encodedMessage);
         if (!$isPublished) {
             $unsentMessage = '['.$title.'] ('.$channelId.'): '.json_encode($update).PHP_EOL;
             self::$subsidiaryLogger->info($unsentMessage);
+        } else {
+            self::$mainLogger->info($encodedMessage);
         }
     }
 
