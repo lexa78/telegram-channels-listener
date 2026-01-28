@@ -1,29 +1,4 @@
 services:
-  rabbitmq:
-    image: rabbitmq:3.13-management
-    container_name: rabbitmq
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-    restart: unless-stopped
-    ports:
-      - "5672:5672"     # AMQP
-      - "15672:15672"   # Web UI
-    environment:
-      RABBITMQ_DEFAULT_USER: "guest"
-      RABBITMQ_DEFAULT_PASS: "guest"
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    networks:
-      - botnet
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   php-bot:
     build:
       context: .
@@ -38,9 +13,6 @@ services:
     volumes:
       - ./:/app          # чтобы код можно было менять без сборки
       - ./session.madeline:/app/session.madeline
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
     networks:
       - botnet
     healthcheck:
@@ -53,10 +25,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
-
-volumes:
-  rabbitmq_data:
-    driver: local
 
 networks:
   botnet:

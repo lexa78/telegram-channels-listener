@@ -27,11 +27,7 @@ class MessageReader extends EventHandler
         self::$rabbit = $rabbit;
     }
 
-    /**
-     * Обработка полученных сообщений.
-     * Метод получает информацию о канале (id, name)) и отправляет сырое сообщение из канала с этими данными в RabbitMQ
-     */
-    public function onUpdateNewChannelMessage(array $update): void
+    private function handleNewAndUpdate(array $update)
     {
         // Получаем ID канала
         $channelId = $update['message']['peer_id'] ?? null;
@@ -54,9 +50,25 @@ class MessageReader extends EventHandler
         if (!$isPublished) {
             $unsentMessage = '['.$title.'] ('.$channelId.'): '.json_encode($update).PHP_EOL;
             self::$subsidiaryLogger->info($unsentMessage);
-        } else {
-            self::$mainLogger->info($encodedMessage);
         }
+    }
+    /**
+     * Обработка полученных сообщений.
+     * Метод получает информацию о канале (id, name)) и отправляет сырое сообщение из канала с этими данными в RabbitMQ
+     */
+    public function onUpdateNewChannelMessage(array $update): void
+    {
+        $this->handleNewAndUpdate($update);
+    }
+
+    /**
+     * Некоторые каналы изменяют сообщения с сигналами
+     * Для этого используется этот метод. Обработка измененных сообщений.
+     * Метод получает информацию о канале (id, name)) и отправляет сырое сообщение из канала с этими данными в RabbitMQ
+     */
+    public function onUpdateEditChannelMessage(array $update): void
+    {
+        $this->handleNewAndUpdate($update);
     }
 
     /**
