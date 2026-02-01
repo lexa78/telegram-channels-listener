@@ -16,15 +16,21 @@ services:
     networks:
       - botnet
     healthcheck:
+      # Проверяем: файл /tmp/bot_alive должен быть изменен менее 2 минут назад
+      # Затем проверяем, что соединение с RabbitMq живое
       test:
         [
           "CMD-SHELL",
-          "php -r 'fsockopen(\"rabbitmq\", 5672) || exit(1);'"
+          "find /tmp/bot_alive -mmin -2 | grep . || exit 1; php -r 'fsockopen(\"rabbitmq\", 5672) || exit(1);'"
         ]
-      interval: 10s
+      interval: 30s
       timeout: 5s
-      retries: 5
-      start_period: 15s
+      retries: 3
+      start_period: 30s # Даем полминуты на старт, прежде чем проверять файл
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
 networks:
   botnet:

@@ -15,6 +15,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Установка зависимостей из composer.json
 COPY composer.json composer.lock* ./
 RUN composer install --no-interaction --prefer-dist
+# Чтобы первая проверка healthceck не провалилась сразу после запуска
+RUN touch /tmp/bot_alive
 
 # Добавляем весь проект
 COPY . .

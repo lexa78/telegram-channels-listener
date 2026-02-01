@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Bot;
 
 use App\Classes\RabbitMQWrapper;
-use danog\MadelineProto\Settings\AppInfo;
+use danog\MadelineProto\Settings;
 use Monolog\Logger;
 
 class BotRunner
@@ -15,7 +15,7 @@ class BotRunner
      */
     public static function run(
         string $session,
-        AppInfo $settings,
+        Settings $settings,
         RabbitMQWrapper $rabbit,
         Logger $mainLogger,
         Logger $subsidiaryLogger,

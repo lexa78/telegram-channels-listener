@@ -52,6 +52,14 @@ class MessageReader extends EventHandler
             self::$subsidiaryLogger->info($unsentMessage);
         }
     }
+
+    public function onLoop(): void
+    {
+        // Просто обновляем метку времени файла.
+        // Если цикл Madeline встанет, файл перестанет обновляться.
+        @touch('/tmp/bot_alive');
+    }
+
     /**
      * Обработка полученных сообщений.
      * Метод получает информацию о канале (id, name)) и отправляет сырое сообщение из канала с этими данными в RabbitMQ

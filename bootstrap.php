@@ -6,10 +6,13 @@ require 'vendor/autoload.php';
 
 use Amp\Log\StreamHandler;
 use App\Classes\RabbitMQWrapper;
+use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 use Dotenv\Dotenv;
 use Monolog\Logger;
 use danog\MadelineProto\Settings\AppInfo;
+
+touch('/tmp/bot_alive');
 
 // Загружаем .env
 $dotenv = Dotenv::createImmutable(__DIR__);
@@ -37,9 +40,24 @@ $subsidiaryLogger->pushHandler($handler);
 $apiId = (int) $_ENV['API_ID'];
 $apiHash = $_ENV['API_HASH'];
 
-$settings = (new AppInfo)
+$appInfo = (new AppInfo)
     ->setApiId($apiId)
     ->setApiHash($apiHash);
+
+// Объект общих настроек
+$settings = new Settings;
+
+// Устанавливаем AppInfo в общие настройки
+$settings->setAppInfo($appInfo);
+
+// Настраиваем соединение (пинги)
+// setPingInterval(30) заставит Madeline отправлять пинги, если нет обновлений
+$settings->getConnection()->setPingInterval(30);
+
+// Если нужен более агрессивный keep-alive на уровне сокета. Попробовать, если ping не поможет
+// $settings->getConnection()->setTcpKeepalive(true);
+
+
 
 // -----------
 // ИНИЦИАЛИЗАЦИЯ RABBITMQ
